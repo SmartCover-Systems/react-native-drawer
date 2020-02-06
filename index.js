@@ -117,24 +117,27 @@ export default class Drawer extends Component {
     this._childDrawer = drawer
   }
 
-  componentWillMount() {
-    if (this.context.drawer) this.context.drawer._registerChildDrawer(this)
+  componentDidMount() {
+    this.resync(null, this.props);
+  }
+
+  constructor(props) {
+    super(props);
+    if (this.drawer) this.drawer._registerChildDrawer(this)
     if (this.props.openDrawerThreshold && process.env.NODE_ENV !== 'production') console.error('react-native-drawer: openDrawerThreshold is obsolete. Use panThreshold instead.')
     if (this.props.panStartCompensation && process.env.NODE_ENV !== 'production') console.error('react-native-drawer: panStartCompensation is deprecated.')
     if (this.props.relativeDrag && process.env.NODE_ENV !== 'production') console.error('react-native-drawer: relativeDrag is deprecated.')
     this.initialize(this.props)
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.requiresResync(nextProps)) this.resync(null, nextProps)
-
-    if (nextProps.open !== null && this._open !== nextProps.open) {
-      this._syncAfterUpdate = true
-      this._open = nextProps.open
-    }
-  }
-
   componentDidUpdate() {
+      if (this.requiresResync(this.props)) this.resync(null, this.props)
+
+      if (this.props.open !== null && this._open !== this.props.open) {
+        this._syncAfterUpdate = true
+        this._open = this.props.open
+      }
+
     if (this._syncAfterUpdate) {
       this._syncAfterUpdate = false
       this._open ? this.open('force') : this.close('force')
@@ -194,11 +197,10 @@ export default class Drawer extends Component {
         onMoveShouldSetPanResponderCapture: this.onMoveShouldSetPanResponderCapture,
         onPanResponderMove: this.onPanResponderMove,
         onPanResponderRelease: this.onPanResponderRelease,
-	onPanResponderTerminate: this.onPanResponderTerminate
+  onPanResponderTerminate: this.onPanResponderTerminate
       })
     }
 
-    this.resync(null, props)
   };
 
   updatePosition = () => {
@@ -398,7 +400,7 @@ export default class Drawer extends Component {
       duration: this.props.tweenDuration,
       easingType: this.props.tweenEasing,
       onFrame: (tweenValue) => {
-	this._length = Math.round(tweenValue*2)/2;
+  this._length = Math.round(tweenValue*2)/2;
         this.updatePosition()
       },
       onEnd: () => {
@@ -432,7 +434,7 @@ export default class Drawer extends Component {
       easingType: this.props.tweenEasing,
       duration: this.props.tweenDuration,
       onFrame: (tweenValue) => {
-	this._length = Math.round(tweenValue*2)/2;
+  this._length = Math.round(tweenValue*2)/2;
         this.updatePosition()
       },
       onEnd: () => {
